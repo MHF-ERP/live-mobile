@@ -21,20 +21,19 @@ export default function SituationsScreen() {
   const [isFirstOpenToday, setIsFirstOpenToday] = useState<boolean | null>(
     null
   );
-  const [loading, setLoading] = useState<boolean>(true);
 
   const router = useRouter();
-  // useEffect(() => {
-  //   const clearAllData = async () => {
-  //     try {
-  //       await AsyncStorage.clear();
-  //       console.log("All AsyncStorage data cleared");
-  //     } catch (e) {
-  //       console.error("Failed to clear AsyncStorage", e);
-  //     }
-  //   };
-  //   clearAllData();
-  // }, []);
+  useEffect(() => {
+    const clearAllData = async () => {
+      try {
+        await AsyncStorage.clear();
+        console.log("All AsyncStorage data cleared");
+      } catch (e) {
+        console.error("Failed to clear AsyncStorage", e);
+      }
+    };
+    clearAllData();
+  }, []);
   useEffect(() => {
     const checkLastOpen = async () => {
       const lastOpen = await AsyncStorage.getItem("opened");
@@ -85,7 +84,6 @@ export default function SituationsScreen() {
       } catch (error) {
         console.error("Error fetching situations", error);
       } finally {
-        setLoading(false);
       }
     };
 
@@ -121,9 +119,7 @@ export default function SituationsScreen() {
       </Animated.View>
     );
   };
-  if (loading) {
-    return null; // أو ممكن تعرض لودر لو حابب
-  }
+
   if (firstOpen || firstOpen === null) {
     return (
       <SafeAreaView style={styles.container}>
