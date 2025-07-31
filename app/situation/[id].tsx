@@ -36,16 +36,62 @@ export default function SituationScreen() {
     fetch();
   }, []);
   //
-  const handleAnswer = async () => {
-    if (!answered.includes(+id)) {
-      const updated = [...answered, +id];
-      await AsyncStorage.setItem("answeredSituations", JSON.stringify(updated));
-      const data = await AsyncStorage.getItem("answeredSituations");
-      console.log("Updated answered situations:", data);
-    }
-    router.replace("/home");
-  };
 
+  const handleAnswer = async (
+    selectedAnswer: string,
+    situationTitle: string
+  ) => {
+    try {
+      if (!answered.includes(+id)) {
+        const updated = [...answered, +id];
+        await AsyncStorage.setItem(
+          "answeredSituations",
+          JSON.stringify(updated)
+        );
+
+        await saveUserAnswer(+id, situationTitle, selectedAnswer);
+
+        console.log("Updated answered situations:", JSON.stringify(updated));
+        console.log("User answer saved successfully");
+      }
+
+      router.replace("/home");
+    } catch (error) {
+      console.error("Error handling answer:", error);
+    }
+  };
+  const saveUserAnswer = async (
+    situationId: number,
+    situationTitle: string,
+    answer: string
+  ) => {
+    try {
+      const existingAnswers = await AsyncStorage.getItem("userAnswers");
+      const answers = existingAnswers ? JSON.parse(existingAnswers) : [];
+
+      const newAnswer = {
+        situationId,
+        situationTitle,
+        answer,
+        answeredAt: new Date().toISOString(),
+      };
+
+      const filteredAnswers = answers.filter(
+        (ans: any) => ans.situationId !== situationId
+      );
+      filteredAnswers.push(newAnswer);
+
+      await AsyncStorage.setItem(
+        "userAnswers",
+        JSON.stringify(filteredAnswers)
+      );
+
+      console.log("User answer saved:", newAnswer);
+    } catch (error) {
+      console.error("Error saving user answer:", error);
+      throw error;
+    }
+  };
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -71,7 +117,7 @@ export default function SituationScreen() {
           <TouchableOpacity
             key={index}
             style={styles.option}
-            onPress={handleAnswer}
+            onPress={() => handleAnswer(choice?.title, situation?.title)}
           >
             <Text style={styles.optionText}>{choice?.title}</Text>
           </TouchableOpacity>
