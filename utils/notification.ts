@@ -22,6 +22,7 @@ export async function registerForPushNotificationsAsync() {
     }
 
     token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log("Got push token:", PUSH);
 
     await axios.post(
       PUSH,
@@ -31,7 +32,7 @@ export async function registerForPushNotificationsAsync() {
       {
         headers: {
           accept: "*/*",
-          Locale: "en",
+          Locale: "ar",
           isLocalized: "false",
           "Content-Type": "application/json",
         },
